@@ -1,0 +1,9 @@
+# ===== 1. ストレージ監視サービス =====
+[Unit]
+Description=p1228 disk and inode usage monitor
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/p1228/storage.env
+ExecStart=/usr/local/sbin/p1228-monitor-storage.sh
