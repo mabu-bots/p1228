@@ -1,0 +1,9 @@
+# ===== 1. ログアーカイブサービス =====
+[Unit]
+Description=p1228 daily journal archive (local only)
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/p1228/storage.env
+ExecStart=/usr/local/sbin/p1228-archive-logs.sh

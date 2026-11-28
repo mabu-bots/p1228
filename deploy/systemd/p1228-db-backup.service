@@ -1,0 +1,9 @@
+# ===== 1. DBバックアップサービス =====
+[Unit]
+Description=p1228 SQLite online backup (local only)
+
+[Service]
+Type=oneshot
+User=root
+EnvironmentFile=-/etc/p1228/storage.env
+ExecStart=/usr/local/sbin/p1228-backup-sqlite.sh
