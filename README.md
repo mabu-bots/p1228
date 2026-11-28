@@ -67,6 +67,14 @@ npm start              # all bots; or: node dist/src/index.js general
 A bot whose token is not set is reported clearly and skipped; the
 process exits normally instead of crash-looping.
 
+## Operations
+
+Scheduled jobs run as systemd timers, independent of the bot
+processes (definitions and scripts in [deploy/](deploy/README.md)):
+daily SQLite backup (03:50 UTC), daily log archive (03:20 UTC,
+90-day retention), and a storage monitor every 10 minutes that only
+notifies and never deletes automatically.
+
 ## Development
 
 This repository follows the family's unified development workflow:
