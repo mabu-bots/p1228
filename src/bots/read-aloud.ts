@@ -11,6 +11,7 @@ import { Client, Events, GatewayIntentBits, Routes } from "discord.js";
 import type { BotId, Config } from "../config.js";
 import { openDatabase } from "../db/index.js";
 import { logger, setLogService } from "../logger.js";
+import { PresenceCycle } from "../presence.js";
 import { READ_ALOUD_COMMANDS } from "../readaloud/commands.js";
 import { AudioCache, AudioSynthesizer, VoicevoxEngine } from "../readaloud/engine.js";
 import { registerReadAloudEvents } from "../readaloud/events.js";
@@ -42,6 +43,18 @@ export async function startReadAloudBot(config: Config, botId: ReadAloudBotId): 
   });
   const service = new ReadAloudVoiceService({ botId, store, synthesizer });
   registerReadAloudEvents({ botId, client, service });
+
+  // 🎮 プレゼンス・サイクル（DESIGN §3.2。星燈と同じ共有モジュール）
+  const presence = new PresenceCycle({
+    displayName: config.bots[botId].displayName,
+    watching: config.bots[botId].watching,
+    send: (activity) => {
+      client.user?.setActivity(activity.name, { type: activity.type });
+    },
+  });
+  client.on(Events.ShardReady, () => presence.markReady());
+  client.on(Events.ShardResume, () => presence.markResumed());
+  client.on(Events.ShardDisconnect, () => presence.markDisconnected());
 
   client.once(Events.ClientReady, (readyClient) => {
     logger.info("bot_ready", { bot_id: botId, user: readyClient.user.tag });
