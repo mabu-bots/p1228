@@ -9,6 +9,7 @@ import { Client, Events, GatewayIntentBits, Routes } from "discord.js";
 import { logger, setLogService } from "../logger.js";
 import { openDatabase } from "../db/index.js";
 import type { Config } from "../config.js";
+import { PresenceCycle } from "../presence.js";
 import { StarSettings } from "../seitou/settings.js";
 import { SeitouState } from "../seitou/state.js";
 import { registerSeitouEvents } from "../seitou/events.js";
@@ -39,6 +40,19 @@ export async function startGeneralBot(config: Config): Promise<Client> {
     llamaBaseUrl: config.llamaBaseUrl,
   };
   registerSeitouEvents(deps);
+
+  // 🎮 プレゼンス・サイクル（DESIGN §3.2）: 接続イベントへ起点の
+  // 扱いを対応づける（READY=数え直し / RESUMED=保持 / 切断=破棄）。
+  const presence = new PresenceCycle({
+    displayName: config.bots.general.displayName,
+    watching: config.bots.general.watching,
+    send: (activity) => {
+      client.user?.setActivity(activity.name, { type: activity.type });
+    },
+  });
+  client.on(Events.ShardReady, () => presence.markReady());
+  client.on(Events.ShardResume, () => presence.markResumed());
+  client.on(Events.ShardDisconnect, () => presence.markDisconnected());
 
   client.once(Events.ClientReady, (readyClient) => {
     logger.info("bot_ready", { bot_id: "general", user: readyClient.user.tag });
