@@ -71,6 +71,13 @@ test("selectBotIds: an unknown value throws", () => {
   assert.throws(() => selectBotIds(["gateway"]), /不明な Bot 指定/);
 });
 
+test("watching phrases match the presence spec (DESIGN 3.2)", () => {
+  const config = loadConfig({});
+  assert.equal(config.bots.general.watching, "サーバーを見守り中");
+  assert.equal(config.bots.read_aloud_a.watching, "言葉を紡ぎ中");
+  assert.equal(config.bots.read_aloud_b.watching, "声をお届け中");
+});
+
 test("missingTokenBots returns only the bots without a token", () => {
   const config = loadConfig({ P1228_GENERAL_TOKEN: "token-general" });
   const missing = missingTokenBots(config, BOT_IDS);

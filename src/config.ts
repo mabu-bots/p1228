@@ -22,6 +22,9 @@ export interface BotConfig {
   id: BotId;
   // 📌 表示名（星燈 / 言ノ葉 / 紡言）
   displayName: string;
+  // 🎮 プレゼンスのパターンAで使う watching 文（DESIGN §3.2。
+  // 旧実装では gateway.yaml の watching で Bot ごとに設定していた）
+  watching: string;
   // 🔑 Discord の Bot トークン（未設定なら null）
   token: string | null;
   // 📌 トークンを読む環境変数名（エラーメッセージ用）
@@ -83,18 +86,21 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
       general: {
         id: "general",
         displayName: "星燈",
+        watching: "サーバーを見守り中",
         token: optional(env, "P1228_GENERAL_TOKEN"),
         tokenEnvName: "P1228_GENERAL_TOKEN",
       },
       read_aloud_a: {
         id: "read_aloud_a",
         displayName: "言ノ葉",
+        watching: "言葉を紡ぎ中",
         token: optional(env, "P1228_READ_ALOUD_A_TOKEN"),
         tokenEnvName: "P1228_READ_ALOUD_A_TOKEN",
       },
       read_aloud_b: {
         id: "read_aloud_b",
         displayName: "紡言",
+        watching: "声をお届け中",
         token: optional(env, "P1228_READ_ALOUD_B_TOKEN"),
         tokenEnvName: "P1228_READ_ALOUD_B_TOKEN",
       },
