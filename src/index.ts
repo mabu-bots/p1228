@@ -9,13 +9,13 @@
 //   node dist/src/index.js read_aloud_a → 言ノ葉のみ
 //   node dist/src/index.js read_aloud_b → 紡言のみ
 //
-// 📌 星燈は Phase 2 で実装済み（コマンド群＋イベント処理）。
-// 言ノ葉・紡言は Phase 3 で実装する。トークン未設定の Bot は、
-// その旨を明確に表示して正常終了する（土台フェーズの方針）。
+// 📌 星燈は Phase 2、言ノ葉・紡言は Phase 3 で実装済み。
+// トークン未設定の Bot は、その旨を明確に表示して正常終了する
+// （土台フェーズの方針）。
 
 import { loadConfig, missingTokenBots, selectBotIds, type BotId } from "./config.js";
 import { startGeneralBot } from "./bots/general.js";
-import { logger } from "./logger.js";
+import { startReadAloudBot } from "./bots/read-aloud.js";
 
 const log = (message: string) => console.log(`[${new Date().toISOString()}] ${message}`);
 
@@ -50,14 +50,12 @@ async function main(): Promise<void> {
   }
 
   for (const id of runnable) {
-    const bot = config.bots[id];
     if (id === "general") {
       // 🤖 星燈: Phase 2 で実装済み。
       await startGeneralBot(config);
     } else {
-      // 🚧 言ノ葉・紡言の本体は Phase 3 で実装する。
-      log(`${bot.displayName}（${bot.id}）: トークンを確認しました（本体は未実装フェーズです）`);
-      logger.info("bot_not_implemented_yet", { bot_id: bot.id });
+      // 🔊 言ノ葉・紡言: Phase 3 で実装済み（同一コードを Bot ごとに起動）。
+      await startReadAloudBot(config, id);
     }
   }
 }
